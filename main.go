@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 
 	"code.google.com/p/go.net/websocket"
 	"github.com/brimstone/go-livereload/static"
@@ -80,9 +81,14 @@ func watchEvents(ws *websocket.Conn) {
 
 func watchdirs(watcher *fsnotify.Watcher) {
 	defer watcher.Close()
+	lastChange := time.Now()
 	for {
 		select {
 		case event := <-watcher.Events:
+			// Don't update when the time changes
+			if time.Since(lastChange) < time.Second {
+				continue
+			}
 			// Don't update when the file is hidden
 			if filepath.Base(event.Name)[0:1] == "." {
 				continue
