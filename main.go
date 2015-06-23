@@ -83,7 +83,15 @@ func watchdirs(watcher *fsnotify.Watcher) {
 	for {
 		select {
 		case event := <-watcher.Events:
-			group.Send(event.Name)
+			// Don't update when the file is hidden
+			if filepath.Base(event.Name)[0:1] == "." {
+				continue
+			}
+			// Don't update when the operation isn't a Write
+			if event.Op&fsnotify.Write == fsnotify.Write {
+				log.Println(event.Name, "changed")
+				group.Send("/" + filepath.Clean(event.Name))
+			}
 		case err := <-watcher.Errors:
 			log.Println("error:", err)
 		}
