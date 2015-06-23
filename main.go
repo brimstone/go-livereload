@@ -16,7 +16,7 @@ import (
 
 var group *bcast.Group
 
-var address = flag.String("a", "0.0.0.0:80*0", "listening address")
+var address = flag.String("a", "0.0.0.0:8080", "listening address")
 
 type lr_plugin struct {
 	Disabled bool   `json:"disabled"`
