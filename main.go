@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"net/http"
 	"os"
@@ -14,6 +15,8 @@ import (
 )
 
 var group *bcast.Group
+
+var address = flag.String("a", "0.0.0.0:80*0", "listening address")
 
 type lr_plugin struct {
 	Disabled bool   `json:"disabled"`
@@ -88,6 +91,7 @@ func watchdirs(watcher *fsnotify.Watcher) {
 }
 
 func main() {
+	flag.Parse()
 	group = bcast.NewGroup()
 	go group.Broadcasting(0)
 
@@ -118,6 +122,6 @@ func main() {
 		return nil
 	})
 
-	log.Println("Starting http server")
-	http.ListenAndServe(":8000", nil)
+	log.Println("Starting http server on " + *address)
+	http.ListenAndServe(*address, nil)
 }
