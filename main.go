@@ -2,10 +2,13 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"runtime"
 	"time"
 
 	"code.google.com/p/go.net/websocket"
@@ -17,7 +20,7 @@ import (
 
 var group *bcast.Group
 
-var address = flag.String("a", "0.0.0.0:8080", "listening address")
+var address = flag.String("a", "127.0.0.1:8080", "listening address")
 
 type lr_plugin struct {
 	Disabled bool   `json:"disabled"`
@@ -104,6 +107,35 @@ func watchdirs(watcher *fsnotify.Watcher) {
 	}
 }
 
+// stolen from github.com/smartystreets/goconvey/goconvey.go
+func browserCmd() (string, bool) {
+	browser := map[string]string{
+		"darwin": "open",
+		"linux":  "xdg-open",
+		"win32":  "start",
+	}
+	cmd, ok := browser[runtime.GOOS]
+	return cmd, ok
+}
+
+func launchBrowser(host string) {
+	browser, ok := browserCmd()
+	if !ok {
+		log.Printf("Skipped launching browser for this OS: %s", runtime.GOOS)
+		return
+	}
+
+	log.Printf("Launching browser on %s", host)
+	url := fmt.Sprintf("http://%s", host)
+	cmd := exec.Command(browser, url)
+
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		log.Println(err)
+		log.Println(string(output))
+	}
+}
+
 func main() {
 	flag.Parse()
 	group = bcast.NewGroup()
@@ -137,5 +169,6 @@ func main() {
 	})
 
 	log.Println("Starting http server on " + *address)
+	go launchBrowser(*address)
 	http.ListenAndServe(*address, nil)
 }
