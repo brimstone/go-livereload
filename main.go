@@ -11,10 +11,10 @@ import (
 	"runtime"
 	"time"
 
-	"code.google.com/p/go.net/websocket"
 	"github.com/brimstone/go-livereload/static"
 	"github.com/elazarl/go-bindata-assetfs"
 	"github.com/grafov/bcast"
+	"golang.org/x/net/websocket"
 	"gopkg.in/fsnotify.v1"
 )
 
