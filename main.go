@@ -142,7 +142,7 @@ func main() {
 	// setup asset handler
 	http.HandleFunc("/livereload.js", livereloadjs)
 	http.Handle("/livereload", websocket.Handler(watchEvents))
-	http.Handle("/", http.FileServer(http.Dir(".")))
+	http.Handle("/", nocache(http.FileServer(http.Dir("."))))
 
 	// setup filesystem watcher
 	watcher, err := fsnotify.NewWatcher()
