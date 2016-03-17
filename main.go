@@ -11,8 +11,6 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/brimstone/go-livereload/static"
-	"github.com/elazarl/go-bindata-assetfs"
 	"github.com/grafov/bcast"
 	"golang.org/x/net/websocket"
 	"gopkg.in/fsnotify.v1"
@@ -142,9 +140,7 @@ func main() {
 	go group.Broadcasting(0)
 
 	// setup asset handler
-	http.Handle("/livereload.js",
-		http.FileServer(
-			&assetfs.AssetFS{Asset: static.Asset, AssetDir: static.AssetDir, Prefix: "www"}))
+	http.HandleFunc("/livereload.js", livereloadjs)
 	http.Handle("/livereload", websocket.Handler(watchEvents))
 	http.Handle("/", http.FileServer(http.Dir(".")))
 
