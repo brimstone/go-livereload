@@ -20,32 +20,32 @@ var group *bcast.Group
 
 var address = flag.String("a", "127.0.0.1:8080", "listening address")
 
-type lr_plugin struct {
+type lrPlugin struct {
 	Disabled bool   `json:"disabled"`
 	Version  string `json:"version"`
 }
 
-type lr_command struct {
-	Command   string               `json:"command"`
-	Protocols []string             `json:"protocols"`
-	Ver       string               `json:"ver"`
-	Snipver   int                  `json:"snipver"`
-	Url       string               `json:"url"`
-	Plugins   map[string]lr_plugin `json:"plugins"`
+type lrCommand struct {
+	Command   string              `json:"command"`
+	Protocols []string            `json:"protocols"`
+	Ver       string              `json:"ver"`
+	Snipver   int                 `json:"snipver"`
+	URL       string              `json:"url"`
+	Plugins   map[string]lrPlugin `json:"plugins"`
 }
 
-func readWebsocket(ws *websocket.Conn, out_chan chan lr_command, err_chan chan error) {
-	var message lr_command
+func readWebsocket(ws *websocket.Conn, outChan chan lrCommand, errChan chan error) {
+	var message lrCommand
 	var err error
 	for {
 		// read in a message
 		err = websocket.JSON.Receive(ws, &message)
 		if err != nil {
-			err_chan <- err
+			errChan <- err
 			return
 		}
 		// send it out of our channel
-		out_chan <- message
+		outChan <- message
 	}
 }
 
@@ -55,7 +55,7 @@ func watchEvents(ws *websocket.Conn) {
 	defer ws.Close()
 	member := group.Join()
 	// start our reader in the background
-	clientmsg := make(chan lr_command)
+	clientmsg := make(chan lrCommand)
 	clienterr := make(chan error)
 	go readWebsocket(ws, clientmsg, clienterr)
 	for {
