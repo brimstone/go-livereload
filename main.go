@@ -57,10 +57,16 @@ func watchEvents(ws *websocket.Conn) {
 	// start our reader in the background
 	clientmsg := make(chan lrCommand)
 	clienterr := make(chan error)
+	bcastchan := make(chan interface{})
 	go readWebsocket(ws, clientmsg, clienterr)
+	go func() {
+		for {
+			bcastchan <- member.Recv()
+		}
+	}()
 	for {
 		select {
-		case val := <-member.In:
+		case val := <-bcastchan:
 			if str, ok := val.(string); ok {
 				websocket.Message.Send(ws, "{\"command\":\"reload\", \"path\":\"/"+str+"\"}")
 			}
@@ -137,7 +143,7 @@ func launchBrowser(host string) {
 func main() {
 	flag.Parse()
 	group = bcast.NewGroup()
-	go group.Broadcasting(0)
+	go group.Broadcast(0)
 
 	// setup asset handler
 	http.HandleFunc("/livereload.js", livereloadjs)
