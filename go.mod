@@ -2,7 +2,7 @@ module github.com/brimstone/go-livereload
 
 require (
 	github.com/grafov/bcast v0.0.0-20170709222704-2c1e067432bb
-	golang.org/x/net v0.22.0
+	golang.org/x/net v0.23.0
 	gopkg.in/fsnotify.v1 v1.4.7
 )
 
