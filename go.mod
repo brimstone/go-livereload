@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/grafov/bcast v0.0.0-20190217190352-1447f067e08d
-	golang.org/x/net v0.57.0
+	golang.org/x/net v0.58.0
 	gopkg.in/fsnotify.v1 v1.4.7
 )
 
